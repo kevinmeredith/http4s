@@ -19,19 +19,10 @@ title: Versions
 <h2>Roadmap</h2>
 
 <ul>
-<<<<<<< HEAD
-  <li><code>http4s-0.16</code> is the final release series based on <a href="https://github.com/scalaz/scalaz-stream">scalaz-stream</a>.  We will continue to support this branch with bugfixes, but not new development.  <code>http4s-0.15</code> will be EOL after the release of http4s-0.16.0.</li>
-  
-  <li><code>http4s-0.17</code> is the first official release series based on <a href="http://typelevel.org/cats/">Cats</a> and <a href="https://github.com/functional-streams-for-scala/fs2">fs2</a>.</li>
-  
-  <li><code>http4s-0.18</code> will be the first release on <a href="https://github.com/typelevel/cats-effect/">cats-effect</a>.</li>
-  
-  <li><code>http4s-1.0</code> will be published some time after <code>cats-1.0</code> and <code>fs2-1.0</code>.</li>
-=======
   <li><code>http4s-0.16</code> is the final release series based on <a href="https://github.com/scalaz/scalaz-stream">scalaz-stream</a>.  We will support this branch with bugfixes, but not new development.</li>
   <li><code>http4s-0.17</code> is the first official release on <a href="http://typelevel.org/cats/">Cats</a> and <a href="https://github.com/functional-streams-for-scala/fs2">fs2</a>.  Interop for Scalaz-based apps will be provided through <a href="https://github.com/djspiewak/shims">Shims</a> or <a href="https://github.com/shawjef3/Harmony">Harmony</a>.</li>
+  <li><code>http4s-0.18</code> will be the first release on <a href="https://github.com/typelevel/cats-effect/">cats-effect</a>.</li>
   <li>We intend to publish <code>http4s-1.0</code> on top of the eventual <code>cats-1.0</code> and <code>fs2-1.0</code></li>
->>>>>>> release-0.16.x
 </ul>
 
 <h2>Matrix</h2>
@@ -76,6 +67,16 @@ title: Versions
 	  </tr>
 	</thead>
 	<tbody>
+      <tr>
+        <td>0.18.0-M1</td>
+        <td class="text-center"><span class="label label-warning">Milestone</span></td>
+        <td class="text-center"><i class="fa fa-ban"></i></td>
+        <td class="text-center"><i class="fa fa-check"></i></td>
+        <td class="text-center"><i class="fa fa-check"></i></td>
+        <td>cats-1.0.0-MF</td>
+        <td>fs2-0.10.0-M6</td>
+        <td>1.8+</td>
+      </tr>
       <tr>
         <td>0.17.0</td>
         <td class="text-center"><span class="label label-primary">Stable</span></td>
