@@ -26,15 +26,21 @@ object ResponseLogger {
       logBody: Boolean,
       redactHeadersWhen: CaseInsensitiveString => Boolean = Headers.SensitiveHeaders.contains,
       logAction: Option[String => F[Unit]] = None
+
+  def logMessageBody[F[_]](
+      logHeaders: Boolean,
+      logBodyText: Option[String => F[String]],
+      redactHeadersWhen: CaseInsensitiveString => Boolean = Headers.SensitiveHeaders.contains,
+      logAction: Option[String => F[Unit]] = None
   )(client: Client[F])(implicit F: Concurrent[F]): Client[F] = {
     val log = logAction.getOrElse { (s: String) =>
       Sync[F].delay(logger.info(s))
     }
     Client { req =>
       client.run(req).flatMap { response =>
-        if (!logBody)
+        if (logBodyText.isEmpty)
           Resource.liftF(
-            Logger.logMessage[F, Response[F]](response)(logHeaders, logBody, redactHeadersWhen)(
+            Logger.logMessage[F, Response[F]](response)(logHeaders, false, redactHeadersWhen)(
               log(_)) *> F.delay(response))
         else
           Resource.suspend {
@@ -50,10 +56,10 @@ object ResponseLogger {
                   .flatMap(v => Stream.emits(v).covary[F])
                   .flatMap(c => Stream.chunk(c).covary[F])
 
-                Logger
-                  .logMessage[F, Response[F]](response.withBodyStream(newBody))(
+                org.http4s.internal.Logger
+                  .logMessageWithBodyText[F, Response[F]](response.withBodyStream(newBody))(
                     logHeaders,
-                    logBody,
+                    logBodyText,
                     redactHeadersWhen)(log(_))
                   .attempt
                   .flatMap {
