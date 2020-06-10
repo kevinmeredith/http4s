@@ -27,38 +27,10 @@ object RequestLogger {
       redactHeadersWhen: CaseInsensitiveString => Boolean = Headers.SensitiveHeaders.contains,
       logAction: Option[String => F[Unit]] = None
   )(client: Client[F]): Client[F] = {
-    val log = logAction.getOrElse { (s: String) =>
-      Sync[F].delay(logger.info(s))
-    }
-    Client { req =>
-      if (!logBody)
-        Resource.liftF(Logger
-          .logMessage[F, Request[F]](req)(logHeaders, logBody, redactHeadersWhen)(log(_))) *> client
-          .run(req)
-      else
-        Resource.suspend {
-          Ref[F].of(Vector.empty[Chunk[Byte]]).map { vec =>
-            val newBody = Stream
-              .eval(vec.get)
-              .flatMap(v => Stream.emits(v).covary[F])
-              .flatMap(c => Stream.chunk(c).covary[F])
+    val logBodyText: Option[String => F[String]] =
+      if (logBody) Some(Concurrent[F].pure) else None
 
-            val changedRequest = req.withBodyStream(
-              req.body
-              // Cannot Be Done Asynchronously - Otherwise All Chunks May Not Be Appended Previous to Finalization
-                .observe(_.chunks.flatMap(s => Stream.eval_(vec.update(_ :+ s))))
-                .onFinalizeWeak(
-                  Logger.logMessage[F, Request[F]](req.withBodyStream(newBody))(
-                    logHeaders,
-                    logBody,
-                    redactHeadersWhen)(log(_))
-                )
-            )
-
-            client.run(changedRequest)
-          }
-        }
-    }
+    logMessageBody[F](logHeaders, logBodyText, redactHeadersWhen, logAction)(client)
   }
 
   def logMessageBody[F[_]: Concurrent](
