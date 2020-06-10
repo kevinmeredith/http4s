@@ -26,6 +26,12 @@ object ResponseLogger {
       logBody: Boolean,
       redactHeadersWhen: CaseInsensitiveString => Boolean = Headers.SensitiveHeaders.contains,
       logAction: Option[String => F[Unit]] = None
+  )(client: Client[F])(implicit F: Concurrent[F]): Client[F] = {
+    val logBodyText: Option[String => F[String]] =
+      if (logBody) Some(F.pure) else None
+
+    logMessageBody[F](logHeaders, logBodyText, redactHeadersWhen, logAction)(client)
+  }
 
   def logMessageBody[F[_]](
       logHeaders: Boolean,
